@@ -3,6 +3,8 @@ import os
 
 
 from bookmarks.parser import Parser
+from bookmarks.merge import Merger
+
 
 if __name__ == '__main__':
     cwd = os.getcwd()
@@ -14,10 +16,10 @@ if __name__ == '__main__':
     argp.add_argument(
         '-f',
         '--file',
-        action='store',
+        action='append',
         dest='file',
-        default=bookmarks_path,
-        help="""        Name or path to the Netscape html bookmarks file"""
+        default=[bookmarks_path],
+        help="""        Name or path to the Netscape html bookmarks file / files"""
     )
     argp.add_argument(
         '-o',
@@ -28,7 +30,11 @@ if __name__ == '__main__':
         help="""        Name or path to store output file"""
     )
     args = argp.parse_args()
-    document = parser.read(args.file)
-    parser.parse(document)
-    parser.dump(args.output)
+    if len(args.file) == 1:
+        document = parser.read(args.file)
+        parser.parse(document)
+        parser.dump(args.output)
+    else:
+        merger = Merger(*args.file)
+        merger.dump(args.output)
     exit()
