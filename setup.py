@@ -1,15 +1,14 @@
 import setuptools
 from setuptools import setup
 
-
 setup(
     name='bookmarks',
-    version='0.2',
+    version='0.3',
     packages=setuptools.find_packages(),
     include_package_data=True,
     url='',
-    license='GPLv3',
-    author='ranger',
-    author_email='ranger@mailsac.com',
-    description='Bookmarks parsing utility'
+    license='None',
+    author='ranger@BlueRingedOctopus',
+    author_email='iamrobox001@tutanota.com',
+    description='bookmarks parsing utility'
 )

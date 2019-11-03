@@ -1,40 +1,39 @@
 import argparse
-import os
+import pathlib
 
 
-from bookmarks.parser import Parser
-from bookmarks.merge import Merger
+from bookmarks.parser.parser import Parser
+from bookmarks.merger.merger import Merger
 
 
 if __name__ == '__main__':
-    cwd = os.getcwd()
-    print(f"Current Directory: {cwd}")
-    bookmarks_path = os.path.join(cwd, 'bookmarks.html')
-    json_path = os.path.join(cwd, 'bookmarks.json')
-    parser = Parser()
-    argp = argparse.ArgumentParser()
-    argp.add_argument(
+    parser = argparse.ArgumentParser()
+    cwd = pathlib.Path.cwd()
+    print(f"Current working directory is {cwd}")
+    bookmarks_path = cwd / 'bookmarks.html'
+    json_path = cwd / 'bookmarks.json'
+    parser.add_argument(
         '-f',
         '--file',
         action='append',
-        dest='file',
-        default=[bookmarks_path],
-        help="""        Name or path to the Netscape html bookmarks file / files"""
+        dest='files',
+        default=bookmarks_path,
+        help='file to be parsed'
     )
-    argp.add_argument(
+    parser.add_argument(
         '-o',
         '--output',
         action='store',
-        dest='output',
+        dest='output_file',
         default=json_path,
-        help="""        Name or path to store output file"""
+        help='path to output file'
     )
-    args = argp.parse_args()
-    if len(args.file) == 1:
-        document = parser.read(args.file)
-        parser.parse(document)
-        parser.dump(args.output)
+    args = parser.parse_args()
+    if len(args.files) == 1:
+        b_parser = Parser()
+        b_parser.parse(args.files[0])
+        b_parser.dump(args.output_file)
     else:
-        merger = Merger(*args.file)
-        merger.dump(args.output)
+        merger = Merger(*args.files)
+        merger.dump(args.output_file)
     exit()
