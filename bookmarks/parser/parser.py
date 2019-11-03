@@ -134,14 +134,14 @@ class Parser(object):
 
     @staticmethod
     def oldest(string):
-        pattern = re.compile(r'[\d]{10}')
+        pattern = re.compile(r'([\d]{10})\"')
         matches = re.findall(pattern, string)
         old = min(int(i) for i in matches)
         return old
 
     @staticmethod
     def newest(string):
-        pattern = re.compile(r'[\d]{10}')
+        pattern = re.compile(r'([\d]{10})\"')
         matches = re.findall(pattern, string)
         new = max(int(i) for i in matches)
         return new

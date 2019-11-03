@@ -10,14 +10,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     cwd = pathlib.Path.cwd()
     print(f"Current working directory is {cwd}")
-    bookmarks_path = cwd / 'bookmarks.html'
-    json_path = cwd / 'bookmarks.json'
+    bookmarks_path = str(cwd / 'bookmarks.html')
+    json_path = str(cwd / 'bookmarks.json')
     parser.add_argument(
         '-f',
         '--file',
         action='append',
         dest='files',
-        default=bookmarks_path,
+        default=[bookmarks_path],
         help='file to be parsed'
     )
     parser.add_argument(
@@ -30,10 +30,23 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
     if len(args.files) == 1:
+        print("Running in parsing mode")
+        print("Input files:", args.files[0])
+        print("Output files: ", args.output_file)
         b_parser = Parser()
         b_parser.parse(args.files[0])
         b_parser.dump(args.output_file)
+    elif len(args.files) == 2:
+        print("Running in parsing mode")
+        print("Input files:", args.files[1])
+        print("Output files: ", args.output_file)
+        b_parser = Parser()
+        b_parser.parse(args.files[1])
+        b_parser.dump(args.output_file)
     else:
-        merger = Merger(*args.files)
+        print("Running in merge mode")
+        print("Input files:", args.files[1:])
+        print("Output files: ", args.output_file)
+        merger = Merger(*args.files[1:])
         merger.dump(args.output_file)
     exit()

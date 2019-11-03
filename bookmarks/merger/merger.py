@@ -1,6 +1,5 @@
-import re
+import copy
 import json
-from collections.abc import Mapping
 from functools import reduce
 import pathlib
 from bookmarks.parser.parser import Parser
@@ -22,27 +21,26 @@ class Merger(object):
             aggregate.append(result)
         return aggregate
 
-    @staticmethod
-    def elemental_merge(dict_one, dict_two):
-        stamp_one = max(int(stamp) for stamp in re.findall(r'[\d]{10}', json.dumps(dict_one)))
-        stamp_two = max(int(stamp) for stamp in re.findall(r'[\d]{10}', json.dumps(dict_two)))
-
-        def nested_merger(main, supplementary):
-            for key, value in supplementary.items():
-                if key in main and isinstance(main[key], dict) and isinstance(supplementary[key], Mapping):
-                    nested_merger(main[key], supplementary[key])
+    def elemental_merge(self, dict_one, dict_two):
+        result = copy.deepcopy(dict_one)
+        for key, value in dict_two.items():
+            if key not in result:
+                result[key] = copy.deepcopy(value)
+            else:
+                if isinstance(result[key], dict):
+                    if int(result[key]['lastModified']) > int(value['lastModified']):
+                        pass
+                    else:
+                        result[key] = self.elemental_merge(result[key], value)
+                elif isinstance(result[key], list):
+                    for item in range(len(result[key])):
+                        result[key][item] = self.elemental_merge(result[key][item], value[item])
                 else:
-                    main[key] = supplementary[key]
-
-        if stamp_two >= stamp_one:
-            nested_merger(dict_one, dict_two)
-            return dict_one
-        else:
-            nested_merger(dict_two, dict_one)
-            return dict_two
+                    pass
+        return result
 
     def merge(self):
-        result = reduce(self.elemental_merge, self.parsed_files)
+        result = reduce(self.elemental_merge, self.parsed_files, {})
         return result
 
     def dump(self, path):
